@@ -1,107 +1,137 @@
 package model;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class ClienteDAO {
 
-    private List<Cliente> listaClientes;
-    
     public ClienteDAO() {
-        listaClientes = new ArrayList<Cliente>();
-        leArquivoCliente();
     }
-    
+
     public boolean salvar(Cliente novoCliente) {
-        if (buscarPorCpf(novoCliente.getCpf()) == null) {
-            listaClientes.add(novoCliente);
-            escreveArquivoCliente();
-            System.out.println("Cliente salvo.");
+
+        String sql =
+            "INSERT INTO cliente(cpf,nome,telefone,endereco) VALUES(?,?,?,?)";
+
+        try (
+            Connection conn = ConexaoSQLite.conectar();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, novoCliente.getCpf());
+            ps.setString(2, novoCliente.getNome());
+            ps.setString(3, novoCliente.getTelefone());
+            ps.setString(4, novoCliente.getEndereco());
+
+            ps.executeUpdate();
+
             return true;
-        } else {
+
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }
-    
+
     public List<Cliente> buscarTodos() {
-        return listaClientes;
+
+        List<Cliente> clientes = new ArrayList<>();
+
+        String sql = "SELECT * FROM cliente";
+
+        try (
+            Connection conn = ConexaoSQLite.conectar();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)
+        ) {
+
+            while (rs.next()) {
+
+                Cliente c = new Cliente(
+                        rs.getString("cpf"),
+                        rs.getString("nome")
+                );
+
+                c.setTelefone(rs.getString("telefone"));
+                c.setEndereco(rs.getString("endereco"));
+
+                clientes.add(c);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return clientes;
     }
-    
+
     public Cliente buscarPorCpf(String cpf) {
-        Cliente c = null;
-        boolean achou = false;
-        Iterator<Cliente> iteC = listaClientes.iterator();
+
         cpf = retiraPontuacao(cpf);
 
-        while (iteC.hasNext() & !achou) {
-            c = (Cliente) iteC.next();
-            if (retiraPontuacao(c.getCpf()).equals(cpf)) {
-                achou = true;
+        String sql =
+                "SELECT * FROM cliente WHERE cpf = ?";
+
+        try (
+            Connection conn = ConexaoSQLite.conectar();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, cpf);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Cliente c = new Cliente(
+                        rs.getString("cpf"),
+                        rs.getString("nome")
+                );
+
+                c.setTelefone(rs.getString("telefone"));
+                c.setEndereco(rs.getString("endereco"));
+
+                return c;
             }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        
-        if (achou) {
-            return c;
+
+        return null;
+    }
+
+    public String gerarRelatorio() {
+
+        StringBuilder relatorio = new StringBuilder();
+
+        relatorio.append("\tRelatório de Clientes\n");
+
+        List<Cliente> clientes = buscarTodos();
+
+        if (clientes.isEmpty()) {
+
+            relatorio.append(" - - não há clientes cadastrados - - ");
+
         } else {
-            return null;
+
+            for (Cliente c : clientes) {
+                relatorio.append(c.imprimir()).append("\n");
+            }
+
         }
+
+        return relatorio.toString();
     }
 
     private String retiraPontuacao(String texto) {
+
         texto = texto.replace(".", "");
         texto = texto.replace("-", "");
         texto = texto.replace("/", "");
         texto = texto.replace("*", "");
+
         return texto;
-    }
-
-    public String gerarRelatorio() {
-        String relatorio = new String();
-        Iterator<Cliente> ite;
-        relatorio += "\tRelatório de Clientes\n";
-        if (listaClientes.isEmpty()) {
-            relatorio += " - - não há clientes cadastrados - - ";
-        } else {
-            ite = listaClientes.iterator();
-            while (ite.hasNext()) {
-                relatorio += ((Cliente) ite.next()).imprimir() + "\n";
-            }
-        }
-        return relatorio;
-    }
-
-    private void leArquivoCliente() {
-        try {
-            // Deserialize from a file
-            File file = new File("cliente.ser");
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-            // Deserialize the object
-            listaClientes = (List<Cliente>) in.readObject();
-            in.close();
-
-        } catch (ClassNotFoundException e) {
-            e.fillInStackTrace();
-        } catch (IOException e) {
-            e.fillInStackTrace();
-        }
-    }
-
-    private void escreveArquivoCliente() {
-        try {
-            // Serialize to a file
-            ObjectOutput out = new ObjectOutputStream(new FileOutputStream("cliente.ser"));
-            out.writeObject(listaClientes);
-            out.close();
-        } catch (IOException e) {
-            e.fillInStackTrace();
-        }
     }
 }
