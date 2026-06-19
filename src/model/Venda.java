@@ -10,7 +10,8 @@ import java.util.List;
 
 public class Venda implements Serializable {
 
-	private Date dataVenda;
+	private int id;
+    private Date dataVenda;
 	private Funcionario funcionario;
 	private Cliente cliente;
     private List<ItemVenda> itensVenda;
@@ -55,6 +56,18 @@ public class Venda implements Serializable {
 	public void setFormaPagamento(String formaPagamento) {
 		this.formaPagamento = formaPagamento;
 	}
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public List<ItemVenda> getItensVenda() {
+        return itensVenda;
+    }
 
 	public boolean inserirProduto(Produto produto, int quantidade) {
         if (produto.venderEstoque(quantidade)) {

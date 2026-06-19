@@ -1,0 +1,17 @@
+# Java
+*.class
+
+# Banco de dados
+*.db
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# JARs (opcional se quiser limpar repo)
+lib/*.jar
+
+# Java compiled
+bin/
+*.class

@@ -15,7 +15,7 @@ public class ClienteDAO {
             "INSERT INTO cliente(cpf,nome,telefone,endereco) VALUES(?,?,?,?)";
 
         try (
-            Connection conn = ConexaoSQLite.conectar();
+            Connection conn = ConexaoBD.conectar();
             PreparedStatement ps = conn.prepareStatement(sql)
         ) {
 
@@ -41,7 +41,7 @@ public class ClienteDAO {
         String sql = "SELECT * FROM cliente";
 
         try (
-            Connection conn = ConexaoSQLite.conectar();
+            Connection conn = ConexaoBD.conectar();
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql)
         ) {
@@ -74,7 +74,7 @@ public class ClienteDAO {
                 "SELECT * FROM cliente WHERE cpf = ?";
 
         try (
-            Connection conn = ConexaoSQLite.conectar();
+            Connection conn = ConexaoBD.conectar();
             PreparedStatement ps = conn.prepareStatement(sql)
         ) {
 
