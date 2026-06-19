@@ -1,107 +1,152 @@
 package model;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class ProdutoDAO {
-	
-	private List<Produto> listaProdutos;
-	
-	public ProdutoDAO() {
-		listaProdutos = new ArrayList<Produto>();
-		leArquivoProduto();
-	}
-	
+
+    public ProdutoDAO() {
+    }
+
     public boolean salvar(Produto novoProduto) {
-        if (buscarPorCodigoBarras(novoProduto.getCodigoBarras()) == null) {
-            listaProdutos.add(novoProduto);
-            escreveArquivoProduto();
+
+        String sql =
+            "INSERT INTO produto " +
+            "(codigo_barras, nome, fabricante, categoria, preco_venda, quantidade_estoque) " +
+            "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (
+            Connection conn = ConexaoBD.conectar();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, novoProduto.getCodigoBarras());
+            ps.setString(2, novoProduto.getNome());
+            ps.setString(3, novoProduto.getFabricante());
+            ps.setString(4, novoProduto.getCategoria());
+            ps.setDouble(5, novoProduto.getPrecoVenda());
+            ps.setInt(6, novoProduto.getQuantidadeEstoque());
+
+            ps.executeUpdate();
+
             System.out.println("Produto salvo.");
+
             return true;
-        } else {
+
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }
-    
+
     public List<Produto> buscarTodos() {
+
+        List<Produto> listaProdutos = new ArrayList<>();
+
+        String sql = "SELECT * FROM produto";
+
+        try (
+            Connection conn = ConexaoBD.conectar();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)
+        ) {
+
+            while (rs.next()) {
+
+                Produto p = new Produto(
+                        rs.getString("codigo_barras"),
+                        rs.getString("nome"),
+                        rs.getString("fabricante"),
+                        rs.getString("categoria"),
+                        rs.getDouble("preco_venda"),
+                        rs.getInt("quantidade_estoque")
+                );
+
+                listaProdutos.add(p);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return listaProdutos;
     }
-    
+
     public Produto buscarPorCodigoBarras(String cod) {
-        Produto p = null;
-        boolean achou = false;
-        Iterator<Produto> iteP = listaProdutos.iterator();
+
         cod = retiraPontuacao(cod);
-        
-        while (iteP.hasNext() & !achou) {
-            p = (Produto) iteP.next();
-            if (retiraPontuacao(p.getCodigoBarras()).equals(cod)) {
-                achou = true;
+
+        String sql =
+                "SELECT * FROM produto WHERE codigo_barras = ?";
+
+        try (
+            Connection conn = ConexaoBD.conectar();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, cod);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                return new Produto(
+                        rs.getString("codigo_barras"),
+                        rs.getString("nome"),
+                        rs.getString("fabricante"),
+                        rs.getString("categoria"),
+                        rs.getDouble("preco_venda"),
+                        rs.getInt("quantidade_estoque")
+                );
             }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        
-        if (achou) {
-            return p;
-        } else {
-            return null;
-        }
+
+        return null;
     }
 
     public String gerarRelatorio() {
-        String relatorio = new String();
-        Iterator<Produto> ite;
-        relatorio += "\n\tRelatório de Produtos\n";
+
+        StringBuilder relatorio = new StringBuilder();
+
+        relatorio.append("\n\tRelatório de Produtos\n");
+
+        List<Produto> listaProdutos = buscarTodos();
+
         if (listaProdutos.isEmpty()) {
-            relatorio += " - - não há produtos cadastrados - - ";
+
+            relatorio.append(
+                    " - - não há produtos cadastrados - - "
+            );
+
         } else {
-            ite = listaProdutos.iterator();
-            while (ite.hasNext()) {
-                relatorio += ((Produto) ite.next()).imprimir() + "\n";
+
+            for (Produto produto : listaProdutos) {
+
+                relatorio.append(
+                        produto.imprimir()
+                ).append("\n");
             }
         }
-        return relatorio;
+
+        return relatorio.toString();
     }
 
     private String retiraPontuacao(String texto) {
+
         texto = texto.replace(".", "");
         texto = texto.replace("-", "");
         texto = texto.replace("/", "");
         texto = texto.replace("*", "");
+
         return texto;
-    }
-
-    private void leArquivoProduto() {
-        try {
-            // Deserialize from a file
-            File file = new File("produto.ser");
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-            // Deserialize the object
-            listaProdutos = (List<Produto>) in.readObject();
-            in.close();
-
-        } catch (ClassNotFoundException e) {
-            System.out.println(e.fillInStackTrace());
-        } catch (IOException e) {
-            System.out.println(e.fillInStackTrace());
-        }
-    }
-
-    private void escreveArquivoProduto() {
-        try {
-            // Serialize to a file
-            ObjectOutput out = new ObjectOutputStream(new FileOutputStream("produto.ser"));
-            out.writeObject(listaProdutos);
-            out.close();
-        } catch (IOException e) {
-            e.fillInStackTrace();
-        }
     }
 }

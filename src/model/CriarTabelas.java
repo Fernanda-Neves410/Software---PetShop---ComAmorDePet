@@ -41,6 +41,34 @@ public class CriarTabelas {
                 "FOREIGN KEY (venda_id) REFERENCES VENDA(id)" +
                 ");";
 
+        String sqlProduto =
+                "CREATE TABLE IF NOT EXISTS PRODUTO (" +
+                "codigo_barras TEXT PRIMARY KEY," +
+                "nome TEXT NOT NULL," +
+                "fabricante TEXT," +
+                "categoria TEXT," +
+                "preco_venda REAL," +
+                "quantidade_estoque INTEGER" +
+                ");";
+
+        String sqlServico =
+                "CREATE TABLE IF NOT EXISTS SERVICO (" +
+                "codigo_servico TEXT PRIMARY KEY," +
+                "nome TEXT NOT NULL," +
+                "preco_servico REAL" +
+                ");";
+
+        String sqlFuncionario =
+                "CREATE TABLE IF NOT EXISTS funcionario (" +
+                "matricula TEXT PRIMARY KEY, " +
+                "cpf TEXT, " +
+                "nome TEXT, " +
+                "telefone TEXT, " +
+                "email TEXT, " +
+                "login TEXT, " +
+                "permissao INTEGER" +
+                ");";
+
         try (
             Connection conn = ConexaoBD.conectar();
             Statement stmt = conn.createStatement()
@@ -49,6 +77,9 @@ public class CriarTabelas {
             stmt.execute(sqlCliente);
             stmt.execute(sqlVenda);
             stmt.execute(sqlItemVenda);
+            stmt.execute(sqlProduto);
+            stmt.execute(sqlServico);
+            stmt.execute(sqlFuncionario);
 
             System.out.println("Tabelas criadas com sucesso.");
 

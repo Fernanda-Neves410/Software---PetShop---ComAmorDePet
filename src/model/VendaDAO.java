@@ -8,56 +8,55 @@ public class VendaDAO {
 
     public void salvar(Venda venda) {
 
-        String sqlVenda =
-                "INSERT INTO VENDA " +
-                "(cpf_cliente, matricula_funcionario, data, forma_pagamento, total) " +
-                "VALUES (?, ?, ?, ?, ?)";
+    String sqlVenda =
+        "INSERT INTO venda (data, cpf_cliente, matricula_funcionario, forma_pagamento, total) " +
+        "VALUES (?, ?, ?, ?, ?)";
 
-        String sqlItem =
-                "INSERT INTO ITEM_VENDA " +
-                "(venda_id, tipo, nome_item, quantidade, valor_unitario, subtotal) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+    String sqlItem =
+        "INSERT INTO item_venda (venda_id, tipo, nome_item, quantidade, valor_unitario, subtotal) " +
+        "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (
-            Connection conn = ConexaoBD.conectar()
-        ) {
+    try (
+        Connection conn = ConexaoBD.conectar();
+        PreparedStatement psVenda =
+                conn.prepareStatement(sqlVenda, Statement.RETURN_GENERATED_KEYS)
+    ) {
 
-            PreparedStatement psVenda =
-                    conn.prepareStatement(sqlVenda, Statement.RETURN_GENERATED_KEYS);
+        psVenda.setString(1, venda.retornaData());
+        psVenda.setString(2, venda.getCliente().getCpf());
 
-            psVenda.setString(1, venda.getCliente().getCpf());
-            psVenda.setString(2, venda.getFuncionario().getMatricula());
-            psVenda.setString(3, venda.retornaData());
-            psVenda.setString(4, venda.getFormaPagamento());
-            psVenda.setDouble(5, venda.getTotal());
+        if (venda.getFuncionario() != null) {
+            psVenda.setString(3, venda.getFuncionario().getMatricula());
+        } else {
+            psVenda.setString(3, null);
+        }
 
-            psVenda.executeUpdate();
+        psVenda.setString(4, venda.getFormaPagamento());
+        psVenda.setDouble(5, venda.getTotal());
 
-            ResultSet rs = psVenda.getGeneratedKeys();
+        psVenda.executeUpdate();
 
-            if (rs.next()) {
-                venda.setId(rs.getInt(1));
-            }
+        ResultSet rs = psVenda.getGeneratedKeys();
+
+        if (rs.next()) {
+
+            int vendaId = rs.getInt(1);
+            venda.setId(vendaId);
 
             PreparedStatement psItem =
                     conn.prepareStatement(sqlItem);
 
             for (ItemVenda item : venda.getItensVenda()) {
 
-                psItem.setInt(1, venda.getId());
-
+                psItem.setInt(1, vendaId);
                 psItem.setInt(2, item.getTipo());
 
                 if (item.getTipo() == 1) {
-                    psItem.setString(
-                            3,
-                            item.getProdutoVendido().getNome()
-                    );
+                    psItem.setString(3,
+                            item.getProdutoVendido().getNome());
                 } else {
-                    psItem.setString(
-                            3,
-                            item.getServicoContratado().getNome()
-                    );
+                    psItem.setString(3,
+                            item.getServicoContratado().getNome());
                 }
 
                 psItem.setInt(4, item.getQuantidade());
@@ -66,14 +65,14 @@ public class VendaDAO {
 
                 psItem.executeUpdate();
             }
-
-            System.out.println("Venda salva no banco.");
-
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-    }
 
+        System.out.println("Venda salva no banco.");
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
     public List<Venda> buscarTodos() {
 
         List<Venda> vendas = new ArrayList<>();

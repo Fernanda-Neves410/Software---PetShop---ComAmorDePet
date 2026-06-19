@@ -5,7 +5,7 @@
 package view;
 
 import model.Produto;
-//import model.Funcionario;
+import model.Servico;
 import model.Cliente;
 import model.Venda;
 import javax.swing.JOptionPane;
@@ -364,35 +364,89 @@ public class ViewVenda extends javax.swing.JPanel {
     }//GEN-LAST:event_jButtonFecharJanelaActionPerformed
 
     private void incluiritem() {
-        DefaultTableModel model = (DefaultTableModel) jTableItens.getModel();
-        String cod;
-        cod = (String) JOptionPane.showInputDialog(null,
-                "Código de Barras: ", "Registro de item de Venda",
-                JOptionPane.QUESTION_MESSAGE, null, null, null);
 
-        if (cod != null) {
-            cod.replaceAll(" ", "");
+        DefaultTableModel model =
+                (DefaultTableModel) jTableItens.getModel();
 
-            if (!cod.isEmpty()) {
-                Produto produto = ComAmorDePetApp.controle.buscarProdutoCodigo(cod);
-                if (produto == null) {
-                    ComAmorDePetApp.mostraMensagem("Produto não cadastrado!\n "
-                            + "Por favor, digite outro código de barras.",
-                            "Busca de Produto");
+        Object[] tipos = {"Produto", "Serviço"};
 
-                } else {
-                    venda.inserirProduto(produto);
-                    model.insertRow(model.getRowCount(),
-                            new Object[]{model.getRowCount() + 1,
-                                produto.getNome(), produto.getPrecoReais()});
-                    jLabelValor.setVisible(true);
-                    jLabelValor.setText(venda.getTotalReais());
-                    // TODO:  fazer a tabela rodar automaticamente
-                    jButtonPagamento.setVisible(true);
-                }
-            }
+        String tipo = (String) JOptionPane.showInputDialog(
+                null,
+                "O que deseja incluir?",
+                "Registro de Item",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                tipos,
+                "Produto");
+
+        if (tipo == null) {
+            return;
         }
 
+        String cod = JOptionPane.showInputDialog(
+                null,
+                tipo.equals("Produto")
+                        ? "Código de Barras:"
+                        : "Código do Serviço:"
+        );
+
+        if (cod == null || cod.trim().isEmpty()) {
+            return;
+        }
+
+        if (tipo.equals("Produto")) {
+
+            Produto produto =
+                    ComAmorDePetApp.controle.buscarProdutoCodigo(cod);
+
+            if (produto == null) {
+
+                ComAmorDePetApp.mostraMensagem(
+                        "Produto não cadastrado!",
+                        "Busca de Produto");
+
+                return;
+            }
+
+            venda.inserirProduto(produto);
+
+            model.insertRow(
+                    model.getRowCount(),
+                    new Object[]{
+                        model.getRowCount() + 1,
+                        produto.getNome(),
+                        produto.getPrecoReais()
+                    });
+
+        } else {
+
+            Servico servico =
+                    ComAmorDePetApp.controle.buscarServicoCodigo(cod);
+
+            if (servico == null) {
+
+                ComAmorDePetApp.mostraMensagem(
+                        "Serviço não cadastrado!",
+                        "Busca de Serviço");
+
+                return;
+            }
+
+            venda.inserirServico(servico);
+
+            model.insertRow(
+                    model.getRowCount(),
+                    new Object[]{
+                        model.getRowCount() + 1,
+                        servico.getNome(),
+                        servico.getPrecoReais()
+                    });
+        }
+
+        jLabelValor.setVisible(true);
+        jLabelValor.setText(venda.getTotalReais());
+
+        jButtonPagamento.setVisible(true);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCliente;

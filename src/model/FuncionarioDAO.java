@@ -1,108 +1,121 @@
 package model;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class FuncionarioDAO {
 
-    private List<Funcionario> listaFuncionarios;
-    
-    public FuncionarioDAO() {
-        listaFuncionarios = new ArrayList<Funcionario>();
-        leArquivoFuncionario();
-    }
-    
-    public boolean salvar(Funcionario novoFuncionario) {
-        if (buscarPorMatricula(novoFuncionario.getMatricula()) == null) {
-            listaFuncionarios.add(novoFuncionario);
-            escreveArquivoFuncionario();
-            System.out.println("Funcionario salvo.");
+    public boolean salvar(Funcionario f) {
+
+        String sql =
+            "INSERT INTO funcionario (matricula, cpf, nome, telefone, email, login, permissao) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (
+            Connection conn = ConexaoBD.conectar();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, f.getMatricula());
+            ps.setString(2, f.getCpf());
+            ps.setString(3, f.getNome());
+            ps.setString(4, f.getTelefone());
+            ps.setString(5, f.getEmail());
+            ps.setString(6, f.getLogin());
+            ps.setInt(7, f.getPermissao());
+
+            ps.executeUpdate();
             return true;
-        } else {
+
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
     }
-    
-    public List<Funcionario> buscarTodos() {
-        return listaFuncionarios;
-    }
-    
-    public Funcionario buscarPorMatricula(String matricula) { // A busca deveria ser por matrícula?
-        Funcionario f = null;
-        boolean achou = false;
-        Iterator<Funcionario> iteF = listaFuncionarios.iterator();
-        matricula = retiraPontuacao(matricula);
 
-        while (iteF.hasNext() & !achou) {
-            f = (Funcionario) iteF.next();
-            if (retiraPontuacao(f.getMatricula()).equals(matricula)) {
-                achou = true;
+    public Funcionario buscarPorMatricula(String matricula) {
+
+        String sql = "SELECT * FROM funcionario WHERE matricula = ?";
+
+        try (
+            Connection conn = ConexaoBD.conectar();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, matricula);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                return new Funcionario(
+                        rs.getString("matricula"),
+                        rs.getString("cpf"),
+                        rs.getString("nome"),
+                        rs.getString("telefone"),
+                        rs.getString("email"),
+                        rs.getString("login"),
+                        rs.getInt("permissao")
+                );
             }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        
-        if (achou) {
-            return f;
-        } else {
-            return null;
-        }
+
+        return null;
     }
 
-    private String retiraPontuacao(String texto) {
-        texto = texto.replace(".", "");
-        texto = texto.replace("-", "");
-        texto = texto.replace("/", "");
-        texto = texto.replace("*", "");
-        return texto;
+    public List<Funcionario> buscarTodos() {
+
+        List<Funcionario> lista = new ArrayList<>();
+
+        String sql = "SELECT * FROM funcionario";
+
+        try (
+            Connection conn = ConexaoBD.conectar();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)
+        ) {
+
+            while (rs.next()) {
+
+                Funcionario f = new Funcionario(
+                        rs.getString("matricula"),
+                        rs.getString("cpf"),
+                        rs.getString("nome"),
+                        rs.getString("telefone"),
+                        rs.getString("email"),
+                        rs.getString("login"),
+                        rs.getInt("permissao")
+                );
+
+                lista.add(f);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return lista;
     }
 
     public String gerarRelatorio() {
-        String relatorio = new String();
-        Iterator<Funcionario> ite;
-        relatorio += "\tRelatório de Funcionários\n";
-        if (listaFuncionarios.isEmpty()) {
-            relatorio += " - - não há funcionários cadastrados - - ";
+
+        StringBuilder rel = new StringBuilder();
+        rel.append("\n\tRelatório de Funcionários\n");
+
+        List<Funcionario> lista = buscarTodos();
+
+        if (lista.isEmpty()) {
+            rel.append(" - - nenhum funcionário cadastrado - - ");
         } else {
-            ite = listaFuncionarios.iterator();
-            while (ite.hasNext()) {
-                relatorio += ((Funcionario) ite.next()).imprimir() + "\n";
+            for (Funcionario f : lista) {
+                rel.append(f.imprimir()).append("\n");
             }
         }
-        return relatorio;
+
+        return rel.toString();
     }
-
-    private void leArquivoFuncionario() {
-        try {
-            // Deserialize from a file
-            File file = new File("funcionario.ser");
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-            // Deserialize the object
-            listaFuncionarios = (List<Funcionario>) in.readObject();
-            in.close();
-
-        } catch (ClassNotFoundException e) {
-            e.fillInStackTrace();
-        } catch (IOException e) {
-            e.fillInStackTrace();
-        }
-    }
-
-    private void escreveArquivoFuncionario() {
-        try {
-            // Serialize to a file
-            ObjectOutput out = new ObjectOutputStream(new FileOutputStream("funcionario.ser"));
-            out.writeObject(listaFuncionarios);
-            out.close();
-        } catch (IOException e) {
-            e.fillInStackTrace();
-        }
-    }
-
 }

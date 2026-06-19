@@ -19,7 +19,7 @@ public class ClienteDAO {
             PreparedStatement ps = conn.prepareStatement(sql)
         ) {
 
-            ps.setString(1, novoCliente.getCpf());
+            ps.setString(1, retiraPontuacao(novoCliente.getCpf()));
             ps.setString(2, novoCliente.getNome());
             ps.setString(3, novoCliente.getTelefone());
             ps.setString(4, novoCliente.getEndereco());
@@ -89,8 +89,9 @@ public class ClienteDAO {
                         rs.getString("nome")
                 );
 
-                c.setTelefone(rs.getString("telefone"));
                 c.setEndereco(rs.getString("endereco"));
+                c.setTelefone(rs.getString("telefone"));
+                c.setEmail(rs.getString("email"));
 
                 return c;
             }
