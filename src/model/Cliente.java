@@ -10,7 +10,7 @@ public class Cliente implements Serializable {
 	private String email;
 	private String cidade;
 	private String estado;
-//	private Venda venda;
+	// private Venda venda;
 
 	public Cliente(String cpf, String nome, String endereco, String telefone, String email) {
 		setCpf(cpf);
@@ -24,40 +24,49 @@ public class Cliente implements Serializable {
 		setCpf(cpf);
 		setNome(nome);
 	}
-	
+
 	public String getCpf() {
 		return cpf;
 	}
+
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
 	}
+
 	public String getNome() {
 		return nome;
 	}
+
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
+
 	public String getEndereco() {
 		return endereco;
 	}
+
 	public void setEndereco(String endereco) {
 		this.endereco = endereco;
 	}
+
 	public String getTelefone() {
 		return telefone;
 	}
+
 	public void setTelefone(String telefone) {
 		this.telefone = telefone;
 	}
+
 	public String getEmail() {
 		return email;
 	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
 	public String getCidade() {
-    	return cidade;
+		return cidade;
 	}
 
 	public void setCidade(String cidade) {
@@ -72,10 +81,10 @@ public class Cliente implements Serializable {
 		this.estado = estado;
 	}
 
-	
-    public String imprimir() {
-        return "CPF: " + getCpf() + " / Nome: " + getNome() + " / Endereço: " + getEndereco() + 
-        		" / Telefone: " + getTelefone() + " / Email: " + getEmail();
-    }
-	
+	public String imprimir() {
+		return "CPF: " + getCpf() + " / Nome: " + getNome() +
+				" / Telefone: " + getTelefone() + " / Email: " + getEmail() + " / Endereço: " + getEndereco()
+				+ " / Cidade: " + getCidade() + " / Estado: " + getEstado();
+	}
+
 }

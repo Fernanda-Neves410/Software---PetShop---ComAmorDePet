@@ -11,18 +11,19 @@ public class ClienteDAO {
 
     public boolean salvar(Cliente novoCliente) {
 
-        String sql =
-            "INSERT INTO cliente(cpf,nome,telefone,endereco) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO cliente(cpf,nome,telefone,endereco,email,cidade,estado) VALUES(?,?,?,?,?,?,?)";
 
         try (
-            Connection conn = ConexaoBD.conectar();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                Connection conn = ConexaoBD.conectar();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, retiraPontuacao(novoCliente.getCpf()));
             ps.setString(2, novoCliente.getNome());
             ps.setString(3, novoCliente.getTelefone());
             ps.setString(4, novoCliente.getEndereco());
+            ps.setString(5, novoCliente.getEmail());
+            ps.setString(6, novoCliente.getCidade());
+            ps.setString(7, novoCliente.getEstado());
 
             ps.executeUpdate();
 
@@ -41,20 +42,21 @@ public class ClienteDAO {
         String sql = "SELECT * FROM cliente";
 
         try (
-            Connection conn = ConexaoBD.conectar();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)
-        ) {
+                Connection conn = ConexaoBD.conectar();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
 
                 Cliente c = new Cliente(
                         rs.getString("cpf"),
-                        rs.getString("nome")
-                );
+                        rs.getString("nome"));
 
                 c.setTelefone(rs.getString("telefone"));
                 c.setEndereco(rs.getString("endereco"));
+                c.setEmail(rs.getString("email"));
+                c.setCidade(rs.getString("cidade"));
+                c.setEstado(rs.getString("estado"));
 
                 clientes.add(c);
             }
@@ -70,13 +72,11 @@ public class ClienteDAO {
 
         cpf = retiraPontuacao(cpf);
 
-        String sql =
-                "SELECT * FROM cliente WHERE cpf = ?";
+        String sql = "SELECT * FROM cliente WHERE cpf = ?";
 
         try (
-            Connection conn = ConexaoBD.conectar();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                Connection conn = ConexaoBD.conectar();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cpf);
 
@@ -86,12 +86,13 @@ public class ClienteDAO {
 
                 Cliente c = new Cliente(
                         rs.getString("cpf"),
-                        rs.getString("nome")
-                );
+                        rs.getString("nome"));
 
                 c.setEndereco(rs.getString("endereco"));
                 c.setTelefone(rs.getString("telefone"));
                 c.setEmail(rs.getString("email"));
+                c.setCidade(rs.getString("cidade"));
+                c.setEstado(rs.getString("estado"));
 
                 return c;
             }
