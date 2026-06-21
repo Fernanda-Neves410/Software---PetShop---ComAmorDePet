@@ -19,7 +19,7 @@ public class ViewRelatorio extends javax.swing.JPanel {
         jTextAreaRelatorio = new javax.swing.JTextArea();
 
         // ===== TÍTULO =====
-        jLabelRelTitulo.setFont(new java.awt.Font("Tahoma", Font.BOLD, 16));
+        jLabelRelTitulo.setFont(new java.awt.Font("Tahoma", Font.BOLD, 23));
         jLabelRelTitulo.setText("Relatório do Sistema");
 
         // ===== BOTÃO =====

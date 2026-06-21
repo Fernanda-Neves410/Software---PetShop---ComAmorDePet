@@ -36,7 +36,7 @@ public class ViewCliente extends javax.swing.JPanel {
         jButtonLimpar = new javax.swing.JButton();
 
         // ===== TÍTULO =====
-        jLabelTitulo.setFont(new java.awt.Font("Tahoma", 1, 16));
+        jLabelTitulo.setFont(new java.awt.Font("Tahoma", 1, 23));
         jLabelTitulo.setText("Cadastro de Clientes");
 
         // ===== LABELS =====

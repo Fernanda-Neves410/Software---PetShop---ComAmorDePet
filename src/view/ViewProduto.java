@@ -12,6 +12,8 @@ public class ViewProduto extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabelTitulo = new javax.swing.JLabel("Cadastro de Produtos");
+        jLabelTitulo.setFont(new java.awt.Font("SansSerif", java.awt.Font.BOLD, 23));
+        
 
         jLabelFabricante = new javax.swing.JLabel("Fabricante:");
         jLabelCategoria = new javax.swing.JLabel("Categoria:");
@@ -138,22 +140,33 @@ public class ViewProduto extends javax.swing.JPanel {
 
     private void jButtonSalvarActionPerformed(java.awt.event.ActionEvent evt) {
 
-        String codigoBarras = jFTextFieldCodBarras.getText();
-        String nome = jTextFieldTitulo.getText();
-        String fabricante = jTextFieldFabricante.getText();
-        String categoria = jTextFieldCategoria.getText();
-        String spreco = jTextFieldPreco.getText();
-        String sestoque = jTextFieldEstoque.getText();
+        String codigoBarras = jFTextFieldCodBarras.getText().trim();
+        String nome = jTextFieldTitulo.getText().trim();
+        String fabricante = jTextFieldFabricante.getText().trim();
+        String categoria = jTextFieldCategoria.getText().trim();
+        String spreco = jTextFieldPreco.getText().trim();
+        String sestoque = jTextFieldEstoque.getText().trim();
 
         if (codigoBarras.trim().isEmpty() || nome.trim().isEmpty()) {
             ComAmorDePetApp.mostraMensagem("Preencha os campos obrigatórios!", "Erro");
             return;
         }
 
-        int estoque = Integer.parseInt(sestoque.replace(" ", ""));
-        double preco = transDouble(spreco);
+        int estoque = Integer.parseInt(sestoque.replace(" ", "")); 
+        try {
+            estoque = Integer.parseInt(sestoque);
+            if (estoque < 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            ComAmorDePetApp.mostraMensagem(
+                "Estoque inválido! Digite um número válido (>= 0).",
+                "Erro"
+            );
+            return;
+        }
 
-        if (preco == -1) return;
+        double preco = transDouble(spreco);
+        if (preco < 0) return;
+
 
         Produto produto = ComAmorDePetApp.controle.buscarProdutoCodigo(codigoBarras);
 

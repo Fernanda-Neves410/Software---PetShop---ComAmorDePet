@@ -23,7 +23,7 @@ public class ViewServico extends javax.swing.JPanel {
         jButtonSalvar = new javax.swing.JButton();
         jButtonLimpar = new javax.swing.JButton();
 
-        jLabelTitulo.setFont(new java.awt.Font("Tahoma", 1, 16));
+        jLabelTitulo.setFont(new java.awt.Font("Tahoma", 1, 23));
         jLabelTitulo.setText("Cadastro de Serviços");
 
         jLabelCodigo.setText("Código:");

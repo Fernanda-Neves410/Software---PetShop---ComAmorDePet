@@ -55,7 +55,7 @@ public class ViewVenda extends javax.swing.JPanel {
             }
         });
 
-        jLabelRelTitulo.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabelRelTitulo.setFont(new java.awt.Font("Tahoma", 1, 23)); // NOI18N
         jLabelRelTitulo.setText("Registro de Venda");
         jLabelRelTitulo.setName("jLabelRelTitulo"); // NOI18N
 
