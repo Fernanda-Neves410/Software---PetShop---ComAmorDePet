@@ -11,31 +11,23 @@ import java.util.List;
 
 public class ProdutoDAO {
 
-    public ProdutoDAO() {
-    }
-
-    public boolean salvar(Produto novoProduto) {
+    public boolean salvar(Produto p) {
 
         String sql = "INSERT INTO produto " +
                 "(codigo_barras, nome, fabricante, categoria, preco_venda, quantidade_estoque) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (
-                Connection conn = ConexaoBD.conectar();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, novoProduto.getCodigoBarras());
-            ps.setString(2, novoProduto.getNome());
-            ps.setString(3, novoProduto.getFabricante());
-            ps.setString(4, novoProduto.getCategoria());
-            ps.setDouble(5, novoProduto.getPrecoVenda());
-            ps.setInt(6, novoProduto.getQuantidadeEstoque());
+            ps.setString(1, p.getCodigoBarras());
+            ps.setString(2, p.getNome());
+            ps.setString(3, p.getFabricante());
+            ps.setString(4, p.getCategoria());
+            ps.setDouble(5, p.getPrecoVenda());
+            ps.setInt(6, p.getQuantidadeEstoque());
 
-            ps.executeUpdate();
-
-            System.out.println("Produto salvo.");
-
-            return true;
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -45,58 +37,52 @@ public class ProdutoDAO {
 
     public List<Produto> buscarTodos() {
 
-        List<Produto> listaProdutos = new ArrayList<>();
+        List<Produto> lista = new ArrayList<>();
 
         String sql = "SELECT * FROM produto";
 
-        try (
-                Connection conn = ConexaoBD.conectar();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = ConexaoBD.conectar();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-
-                Produto p = new Produto(
+                lista.add(new Produto(
                         rs.getString("codigo_barras"),
                         rs.getString("nome"),
                         rs.getString("fabricante"),
                         rs.getString("categoria"),
                         rs.getDouble("preco_venda"),
-                        rs.getInt("quantidade_estoque"));
-
-                listaProdutos.add(p);
+                        rs.getInt("quantidade_estoque")
+                ));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return listaProdutos;
+        return lista;
     }
 
     public Produto buscarPorCodigoBarras(String cod) {
 
-        cod = retiraPontuacao(cod);
-
         String sql = "SELECT * FROM produto WHERE codigo_barras = ?";
 
-        try (
-                Connection conn = ConexaoBD.conectar();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cod);
 
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-
                 return new Produto(
                         rs.getString("codigo_barras"),
                         rs.getString("nome"),
                         rs.getString("fabricante"),
                         rs.getString("categoria"),
                         rs.getDouble("preco_venda"),
-                        rs.getInt("quantidade_estoque"));
+                        rs.getInt("quantidade_estoque")
+                );
             }
 
         } catch (SQLException e) {
@@ -106,11 +92,28 @@ public class ProdutoDAO {
         return null;
     }
 
+    public boolean atualizarEstoque(String cod, int novaQuantidade) {
+
+        String sql = "UPDATE produto SET quantidade_estoque = ? WHERE codigo_barras = ?";
+
+        try (Connection conn = ConexaoBD.conectar();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, novaQuantidade);
+            ps.setString(2, cod);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean venderEstoque(Connection conn, String cod, int quantidade) {
-        cod = retiraPontuacao(cod);
 
         String sql = "UPDATE produto SET quantidade_estoque = quantidade_estoque - ? " +
-                "WHERE codigo_barras = ? AND quantidade_estoque >= ?";
+                    "WHERE codigo_barras = ? AND quantidade_estoque >= ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -118,13 +121,8 @@ public class ProdutoDAO {
             ps.setString(2, cod);
             ps.setInt(3, quantidade);
 
-            int rowsAffected = ps.executeUpdate();
+            return ps.executeUpdate() > 0;
 
-            if (rowsAffected > 0) {
-                return true;
-            } else {
-                return false;
-            }
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -134,35 +132,18 @@ public class ProdutoDAO {
     public String gerarRelatorio() {
 
         StringBuilder relatorio = new StringBuilder();
-
         relatorio.append("\n\tRelatório de Produtos\n");
 
-        List<Produto> listaProdutos = buscarTodos();
+        List<Produto> lista = buscarTodos();
 
-        if (listaProdutos.isEmpty()) {
-
-            relatorio.append(
-                    " - - não há produtos cadastrados - - ");
-
+        if (lista.isEmpty()) {
+            relatorio.append(" - - não há produtos cadastrados - - ");
         } else {
-
-            for (Produto produto : listaProdutos) {
-
-                relatorio.append(
-                        produto.imprimir()).append("\n");
+            for (Produto p : lista) {
+                relatorio.append(p.imprimir()).append("\n");
             }
         }
 
         return relatorio.toString();
-    }
-
-    private String retiraPontuacao(String texto) {
-
-        texto = texto.replace(".", "");
-        texto = texto.replace("-", "");
-        texto = texto.replace("/", "");
-        texto = texto.replace("*", "");
-
-        return texto;
     }
 }
