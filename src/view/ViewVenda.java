@@ -383,23 +383,36 @@ public class ViewVenda extends javax.swing.JPanel {
         incluiritem();
     }// GEN-LAST:event_jTableItensKeyPressed
 
-    private void jButtonPagamentoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButtonPagamentoActionPerformed
-        Object[] formasPagto = { "Pix", "Dinheiro", "Cartão Dédito", "Cartão Crédito" };
+    private void jButtonPagamentoActionPerformed(java.awt.event.ActionEvent evt) {
+
+        Object[] formasPagto = {
+            "Pix",
+            "Dinheiro",
+            "Cartão Débito",
+            "Cartão Crédito"
+        };
+
         String s = (String) JOptionPane.showInputDialog(
                 null,
                 "Selecione a forma de pagamento executada:",
                 "Forma de pagamento",
-                JOptionPane.QUESTION_MESSAGE, null,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
                 formasPagto,
                 "Dinheiro");
+
+        if (s == null) {
+            return;
+        }
+
         venda.setFormaPagamento(s);
 
         ComAmorDePetApp.controle.salvarVenda(venda);
+
         jPanelVenda.setVisible(false);
         jPanelNotaFiscal.setVisible(true);
         jTextAreaNotaFiscal.setText(venda.gerarNota());
-
-    }// GEN-LAST:event_jButtonPagamentoActionPerformed
+    }
 
     private void jButtonFecharJanelaActionPerformed(java.awt.event.ActionEvent evt) {
         limparVenda();
