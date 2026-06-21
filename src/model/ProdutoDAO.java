@@ -146,4 +146,62 @@ public class ProdutoDAO {
 
         return relatorio.toString();
     }
+
+    public boolean atualizar(Produto p) {
+
+        String sql = "UPDATE produto SET nome=?, fabricante=?, categoria=?, preco_venda=?, quantidade_estoque=? WHERE codigo_barras=?";
+
+        try (Connection conn = ConexaoBD.conectar();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, p.getNome());
+            ps.setString(2, p.getFabricante());
+            ps.setString(3, p.getCategoria());
+            ps.setDouble(4, p.getPrecoVenda());
+            ps.setInt(5, p.getQuantidadeEstoque());
+            ps.setString(6, p.getCodigoBarras());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean excluir(String cod) {
+
+        String sqlCheck = "SELECT COUNT(*) FROM item_venda WHERE nome_item = (SELECT nome FROM produto WHERE codigo_barras = ?)";
+
+        String sqlDelete = "DELETE FROM produto WHERE codigo_barras = ?";
+
+        try (Connection conn = ConexaoBD.conectar()) {
+
+            // 1. verificar se existe venda
+            try (PreparedStatement psCheck = conn.prepareStatement(sqlCheck)) {
+
+                psCheck.setString(1, cod);
+
+                ResultSet rs = psCheck.executeQuery();
+
+                if (rs.next() && rs.getInt(1) > 0) {
+                    System.out.println("Produto possui histórico de vendas. Não pode ser excluído.");
+                    return false;
+                }
+            }
+
+            // 2. excluir produto
+            try (PreparedStatement ps = conn.prepareStatement(sqlDelete)) {
+
+                ps.setString(1, cod);
+
+                return ps.executeUpdate() > 0;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

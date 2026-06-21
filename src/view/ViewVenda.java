@@ -158,7 +158,7 @@ public class ViewVenda extends javax.swing.JPanel {
             }
         });
 
-        jLabelValor.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabelValor.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
         jLabelValor.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabelValor.setText("R$--");
         jLabelValor.setName("jLabelValor"); // NOI18N

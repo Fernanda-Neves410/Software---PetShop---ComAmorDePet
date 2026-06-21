@@ -93,4 +93,12 @@ public class ComAmorDePetGerenciadora {
         return relatorio;
     }
 
+    public boolean atualizarProduto(Produto p) {
+        return produtoDAO.atualizar(p);
+    }
+
+
+    public boolean excluirProdutoProduto(Produto p) {
+        return produtoDAO.excluir(p);
+    }
 }

@@ -83,4 +83,12 @@ public class ComAmorDePetMVCController {
         return gerenciadora.gerarRelatorioAnimais();
     }
 
+    public boolean atualizarProduto(Produto p) {
+        return gerenciadora.atualizarProduto(p);
+    }
+
+        public boolean excluirProdutoProduto(Produto p) {
+        return gerenciadora.excluirProduto(p);
+    }
+
 }

@@ -31,10 +31,16 @@ public class ViewProduto extends javax.swing.JPanel {
 
         jButtonSalvar = new javax.swing.JButton("Salvar");
         jButtonLimpar = new javax.swing.JButton("Limpar");
+        jButtonBuscar = new javax.swing.JButton("Buscar");
+        jButtonEditar = new javax.swing.JButton("Editar");
+        jButtonExcluir = new javax.swing.JButton("Excluir");
 
         // ===== EVENTOS =====
         jButtonSalvar.addActionListener(evt -> jButtonSalvarActionPerformed(evt));
         jButtonLimpar.addActionListener(evt -> jButtonLimparActionPerformed(evt));
+        jButtonBuscar.addActionListener(evt -> buscarProduto());
+        jButtonEditar.addActionListener(evt -> editarProduto());
+        jButtonExcluir.addActionListener(evt -> excluirProduto());
 
         // ===== LAYOUT =====
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -72,6 +78,12 @@ public class ViewProduto extends javax.swing.JPanel {
                         .addComponent(jButtonLimpar)
                         .addGap(10)
                         .addComponent(jButtonSalvar)
+                        .addGap(10)
+                        .addComponent(jButtonBuscar)
+                        .addGap(10)
+                        .addComponent(jButtonEditar)
+                        .addGap(10)
+                        .addComponent(jButtonExcluir)
                     )
                 )
                 .addGap(20)
@@ -111,7 +123,10 @@ public class ViewProduto extends javax.swing.JPanel {
 
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonLimpar)
-                    .addComponent(jButtonSalvar))
+                    .addComponent(jButtonSalvar)
+                    .addComponent(jButtonBuscar)
+                    .addComponent(jButtonEditar)
+                    .addComponent(jButtonExcluir))
 
                 .addGap(20)
         );
@@ -198,9 +213,106 @@ public class ViewProduto extends javax.swing.JPanel {
         jTextFieldEstoque.setText("");
     }
 
+    private void buscarProduto() {
+
+        String codigo = jFTextFieldCodBarras.getText().trim();
+
+        Produto produto =
+            ComAmorDePetApp.controle.buscarProdutoCodigo(codigo);
+
+        if (produto == null) {
+
+            ComAmorDePetApp.mostraMensagem(
+                "Produto não encontrado!",
+                "Erro"
+            );
+
+            return;
+        }
+
+        jTextFieldTitulo.setText(produto.getNome());
+        jTextFieldFabricante.setText(produto.getFabricante());
+        jTextFieldCategoria.setText(produto.getCategoria());
+        jTextFieldPreco.setText(
+            String.valueOf(produto.getPrecoVenda())
+        );
+        jTextFieldEstoque.setText(
+            String.valueOf(produto.getQuantidadeEstoque())
+        );
+    }
+
+    private void editarProduto() {
+
+        Produto existente = ComAmorDePetApp.controle.buscarProdutoCodigo(codigo);
+
+        if (existente == null) {
+            ComAmorDePetApp.mostraMensagem("Produto não existe!", "Erro");
+            return;
+        }
+        String codigo = jFTextFieldCodBarras.getText().trim();
+
+        String nome = jTextFieldTitulo.getText().trim();
+        String fabricante = jTextFieldFabricante.getText().trim();
+        String categoria = jTextFieldCategoria.getText().trim();
+        String spreco = jTextFieldPreco.getText().trim();
+        String sestoque = jTextFieldEstoque.getText().trim();
+
+        double preco = transDouble(spreco);
+
+        int estoque;
+        try {
+            estoque = Integer.parseInt(sestoque);
+
+            if (estoque < 0) {
+                throw new NumberFormatException();
+            }
+
+        } catch (Exception e) {
+            ComAmorDePetApp.mostraMensagem("Estoque inválido!", "Erro");
+            return;
+        }
+
+        Produto p = new Produto(codigo, nome, fabricante, categoria, preco, estoque);
+
+        boolean ok = ComAmorDePetApp.controle.atualizarProduto(p);
+
+        if (ok) {
+            ComAmorDePetApp.mostraMensagem("Produto atualizado!", "Sucesso");
+        } else {
+            ComAmorDePetApp.mostraMensagem("Erro ao atualizar produto!", "Erro");
+        }
+
+        limparCampos();
+    }
+
+    private void excluirProduto() {
+
+        String cod = jFTextFieldCodBarras.getText().trim();
+
+        if (cod.isEmpty()) {
+            ComAmorDePetApp.mostraMensagem("Informe o código!", "Erro");
+            return;
+        }
+
+        boolean ok = ComAmorDePetApp.controle.excluirProduto(cod);
+
+        if (ok) {
+            ComAmorDePetApp.mostraMensagem("Produto excluído com sucesso!", "Sucesso");
+            limparCampos();
+        } else {
+            ComAmorDePetApp.mostraMensagem(
+                "Não foi possível excluir: produto já vendido ou inexistente.",
+                "Erro"
+            );
+        }
+    }
+
     // ===== COMPONENTES =====
     private javax.swing.JButton jButtonLimpar;
     private javax.swing.JButton jButtonSalvar;
+    private javax.swing.JButton jButtonBuscar;
+    private javax.swing.JButton jButtonEditar;
+    private javax.swing.JButton jButtonExcluir;
 
     private javax.swing.JFormattedTextField jFTextFieldCodBarras;
 
