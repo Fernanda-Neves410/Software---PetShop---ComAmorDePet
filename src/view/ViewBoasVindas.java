@@ -36,9 +36,6 @@ public class ViewBoasVindas extends JPanel {
         btnEntrar.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnEntrar.setPreferredSize(new Dimension(220, 40));
 
-        btnLogin = new JButton("Login (Em breve)");
-        btnLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnLogin.setPreferredSize(new Dimension(220, 40));
 
         // ===== RODAPÉ =====
         JLabel rodape = new JLabel("APSOO - UFMS | Grupo B");
@@ -58,16 +55,13 @@ public class ViewBoasVindas extends JPanel {
         centro.add(btnEntrar);
         centro.add(Box.createVerticalStrut(10));
 
-        centro.add(btnLogin);
-        centro.add(Box.createVerticalStrut(30));
-
         centro.add(rodape);
         centro.add(Box.createVerticalStrut(20));
 
         add(centro, BorderLayout.CENTER);
 
         // ação provisória
-        btnLogin.addActionListener(e ->
+        btnEntrar.addActionListener(e ->
             JOptionPane.showMessageDialog(this, "Funcionalidade em desenvolvimento.")
         );
     }
@@ -76,7 +70,4 @@ public class ViewBoasVindas extends JPanel {
         return btnEntrar;
     }
 
-    public JButton getBtnLogin() {
-        return btnLogin;
-    }
 }
