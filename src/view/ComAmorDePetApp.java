@@ -85,7 +85,6 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
         });
         jMenuBar1.add(jMenuProduto);
 
-        
         jMenuServico.setText("Serviços");
         jMenuServico.setName("jMenuServico");
         jMenuServico.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -131,30 +130,28 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
         painelServico.setVisible(false); // 🔥 ADICIONADO
 
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(painelVenda)
-                .addComponent(painelHome)
-                .addComponent(painelCliente)
-                .addComponent(painelRelatorio)
-                .addComponent(painelProduto)
-                .addComponent(painelServico) // 🔥 ADICIONADO
-                .addContainerGap(121, Short.MAX_VALUE))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(31, 31, 31)
+                                .addComponent(painelVenda)
+                                .addComponent(painelHome)
+                                .addComponent(painelCliente)
+                                .addComponent(painelRelatorio)
+                                .addComponent(painelProduto)
+                                .addComponent(painelServico) // 🔥 ADICIONADO
+                                .addContainerGap(121, Short.MAX_VALUE)));
 
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addComponent(painelVenda)
-                .addComponent(painelHome)
-                .addComponent(painelCliente)
-                .addComponent(painelRelatorio)
-                .addComponent(painelProduto)
-                .addComponent(painelServico) // 🔥 ADICIONADO
-                .addContainerGap(137, Short.MAX_VALUE))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(31, 31, 31)
+                                .addComponent(painelVenda)
+                                .addComponent(painelHome)
+                                .addComponent(painelCliente)
+                                .addComponent(painelRelatorio)
+                                .addComponent(painelProduto)
+                                .addComponent(painelServico) // 🔥 ADICIONADO
+                                .addContainerGap(137, Short.MAX_VALUE)));
 
         pack();
     }// </editor-fold>
@@ -218,6 +215,8 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
     }
 
     public static void main(String args[]) {
+        model.CriarTabelas.criarTabelas();
+
         java.awt.EventQueue.invokeLater(() -> {
             new ComAmorDePetApp().setVisible(true);
         });
@@ -238,5 +237,5 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
     private JPanel painelProduto;
     private JPanel painelHome;
     private JPanel painelVenda;
-    private JPanel painelServico; 
+    private JPanel painelServico;
 }
