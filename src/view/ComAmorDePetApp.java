@@ -20,7 +20,7 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Iniciando componentes">
     private void initComponents() {
-        this.setTitle("Brinque Feliz");
+        this.setTitle("Com Amor de Pet - Gestão de PetShop");
 
         String lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
 
