@@ -33,17 +33,19 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
         jMenuHome = new javax.swing.JMenu();
         jMenuVenda = new javax.swing.JMenu();
         jMenuCliente = new javax.swing.JMenu();
+        jMenuAnimal = new javax.swing.JMenu();
         jMenuProduto = new javax.swing.JMenu();
         jMenuRelatorio = new javax.swing.JMenu();
-        jMenuServico = new javax.swing.JMenu(); // 🔥 ADICIONADO
+        jMenuServico = new javax.swing.JMenu();
         jMenuSair = new javax.swing.JMenu();
 
         painelCliente = new ViewCliente();
+        painelAnimal = new ViewAnimal();
         painelRelatorio = new ViewRelatorio();
         painelProduto = new ViewProduto();
         painelHome = new ViewBoasVindas();
         painelVenda = new ViewVenda();
-        painelServico = new ViewServico(); // 🔥 ADICIONADO
+        painelServico = new ViewServico();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -76,6 +78,15 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
         });
         jMenuBar1.add(jMenuCliente);
 
+        jMenuAnimal.setText("Animais");
+        jMenuAnimal.setName("jMenuAnimal");
+        jMenuAnimal.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenuAnimalMouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(jMenuAnimal);
+
         jMenuProduto.setText("Produtos");
         jMenuProduto.setName("jMenuProduto");
         jMenuProduto.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -91,6 +102,7 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 painelHome.setVisible(false);
                 painelCliente.setVisible(false);
+                painelAnimal.setVisible(false);
                 painelProduto.setVisible(false);
                 painelRelatorio.setVisible(false);
                 painelVenda.setVisible(false);
@@ -123,11 +135,12 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
 
         painelCliente.setVisible(false);
+        painelAnimal.setVisible(false);
         painelRelatorio.setVisible(false);
         painelProduto.setVisible(false);
         painelHome.setVisible(true);
         painelVenda.setVisible(false);
-        painelServico.setVisible(false); // 🔥 ADICIONADO
+        painelServico.setVisible(false);
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -136,9 +149,10 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
                                 .addComponent(painelVenda)
                                 .addComponent(painelHome)
                                 .addComponent(painelCliente)
+                                .addComponent(painelAnimal)
                                 .addComponent(painelRelatorio)
                                 .addComponent(painelProduto)
-                                .addComponent(painelServico) // 🔥 ADICIONADO
+                                .addComponent(painelServico)
                                 .addContainerGap(121, Short.MAX_VALUE)));
 
         layout.setVerticalGroup(
@@ -148,9 +162,10 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
                                 .addComponent(painelVenda)
                                 .addComponent(painelHome)
                                 .addComponent(painelCliente)
+                                .addComponent(painelAnimal)
                                 .addComponent(painelRelatorio)
                                 .addComponent(painelProduto)
-                                .addComponent(painelServico) // 🔥 ADICIONADO
+                                .addComponent(painelServico)
                                 .addContainerGap(137, Short.MAX_VALUE)));
 
         pack();
@@ -168,6 +183,7 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
     private void jMenuHomeMouseClicked(java.awt.event.MouseEvent evt) {
         painelHome.setVisible(true);
         painelCliente.setVisible(false);
+        painelAnimal.setVisible(false);
         painelProduto.setVisible(false);
         painelRelatorio.setVisible(false);
         painelVenda.setVisible(false);
@@ -177,6 +193,17 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
     private void jMenuClienteMouseClicked(java.awt.event.MouseEvent evt) {
         painelHome.setVisible(false);
         painelCliente.setVisible(true);
+        painelAnimal.setVisible(false);
+        painelProduto.setVisible(false);
+        painelRelatorio.setVisible(false);
+        painelVenda.setVisible(false);
+        painelServico.setVisible(false);
+    }
+
+    private void jMenuAnimalMouseClicked(java.awt.event.MouseEvent evt) {
+        painelHome.setVisible(false);
+        painelCliente.setVisible(false);
+        painelAnimal.setVisible(true);
         painelProduto.setVisible(false);
         painelRelatorio.setVisible(false);
         painelVenda.setVisible(false);
@@ -186,6 +213,7 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
     private void jMenuRelatorioMouseClicked(java.awt.event.MouseEvent evt) {
         painelHome.setVisible(false);
         painelCliente.setVisible(false);
+        painelAnimal.setVisible(false);
         painelProduto.setVisible(false);
         painelRelatorio.setVisible(true);
         painelVenda.setVisible(false);
@@ -195,6 +223,7 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
     private void jMenuProdutoMouseClicked(java.awt.event.MouseEvent evt) {
         painelHome.setVisible(false);
         painelCliente.setVisible(false);
+        painelAnimal.setVisible(false);
         painelProduto.setVisible(true);
         painelRelatorio.setVisible(false);
         painelVenda.setVisible(false);
@@ -204,6 +233,7 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
     private void jMenuVendaMouseClicked(java.awt.event.MouseEvent evt) {
         painelHome.setVisible(false);
         painelCliente.setVisible(false);
+        painelAnimal.setVisible(false);
         painelProduto.setVisible(false);
         painelRelatorio.setVisible(false);
         painelVenda.setVisible(true);
@@ -226,6 +256,7 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenu jMenuProduto;
     private javax.swing.JMenu jMenuCliente;
+    private javax.swing.JMenu jMenuAnimal;
     private javax.swing.JMenu jMenuRelatorio;
     private javax.swing.JMenu jMenuSair;
     private javax.swing.JMenu jMenuVenda;
@@ -233,6 +264,7 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
     private javax.swing.JMenu jMenuServico;
 
     private JPanel painelCliente;
+    private JPanel painelAnimal;
     private JPanel painelRelatorio;
     private JPanel painelProduto;
     private JPanel painelHome;

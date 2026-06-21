@@ -6,13 +6,15 @@ public class ComAmorDePetGerenciadora {
     private final ProdutoDAO produtoDAO;
     private final ServicoDAO servicoDAO;
     private final VendaDAO vendaDAO;
-    
+    private final AnimalDAO animalDAO;
+
     public ComAmorDePetGerenciadora() {
-    	clienteDAO = new ClienteDAO();
-    	funcionarioDAO = new FuncionarioDAO();
-    	produtoDAO = new ProdutoDAO();
-    	servicoDAO = new ServicoDAO();
-    	vendaDAO = new VendaDAO();
+        clienteDAO = new ClienteDAO();
+        funcionarioDAO = new FuncionarioDAO();
+        produtoDAO = new ProdutoDAO();
+        servicoDAO = new ServicoDAO();
+        vendaDAO = new VendaDAO();
+        animalDAO = new AnimalDAO();
     }
 
     public boolean salvarCliente(Cliente novoCliente) {
@@ -62,7 +64,7 @@ public class ComAmorDePetGerenciadora {
     public String gerarRelatorioServicos() {
         return servicoDAO.gerarRelatorio();
     }
-    
+
     public void salvarVenda(Venda novaVenda) {
         vendaDAO.salvar(novaVenda);
     }
@@ -71,11 +73,20 @@ public class ComAmorDePetGerenciadora {
         return vendaDAO.gerarRelatorio();
     }
 
+    public boolean salvarAnimal(Animal novoAnimal) {
+        return animalDAO.salvar(novoAnimal);
+    }
+
+    public String gerarRelatorioAnimais() {
+        return animalDAO.gerarRelatorio();
+    }
+
     public String gerarRelatorioCompleto() {
         String relatorio = new String();
         relatorio += "\tRelatório Completo\n";
         relatorio += "\n" + clienteDAO.gerarRelatorio();
         relatorio += "\n" + funcionarioDAO.gerarRelatorio();
+        relatorio += "\n" + animalDAO.gerarRelatorio();
         relatorio += "\n" + produtoDAO.gerarRelatorio();
         relatorio += "\n" + servicoDAO.gerarRelatorio();
         relatorio += "\n" + vendaDAO.gerarRelatorio();

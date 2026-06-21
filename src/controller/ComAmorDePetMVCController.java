@@ -5,15 +5,16 @@ import model.Funcionario;
 import model.Produto;
 import model.Servico;
 import model.Venda;
+import model.Animal; // Import do novo modelo
 import model.ComAmorDePetGerenciadora;
 
 public class ComAmorDePetMVCController {
-	private ComAmorDePetGerenciadora gerenciadora;
+    private ComAmorDePetGerenciadora gerenciadora;
 
     public ComAmorDePetMVCController() {
         gerenciadora = new ComAmorDePetGerenciadora();
     }
-    
+
     public boolean salvarCliente(Cliente novoCliente) {
         return gerenciadora.salvarCliente(novoCliente);
     }
@@ -61,9 +62,9 @@ public class ComAmorDePetMVCController {
     public String gerarRelatorioServicos() {
         return gerenciadora.gerarRelatorioServicos();
     }
-    
+
     public void salvarVenda(Venda novaVenda) {
-    	gerenciadora.salvarVenda(novaVenda);
+        gerenciadora.salvarVenda(novaVenda);
     }
 
     public String gerarRelatorioVendas() {
@@ -71,7 +72,15 @@ public class ComAmorDePetMVCController {
     }
 
     public String gerarRelatorioCompleto() {
-    	return gerenciadora.gerarRelatorioCompleto();
+        return gerenciadora.gerarRelatorioCompleto();
+    }
+
+    public boolean salvarAnimal(Animal novoAnimal) {
+        return gerenciadora.salvarAnimal(novoAnimal);
+    }
+
+    public String gerarRelatorioAnimais() {
+        return gerenciadora.gerarRelatorioAnimais();
     }
 
 }
