@@ -23,7 +23,11 @@ public class VendaDAO {
     ) {
 
         psVenda.setString(1, venda.retornaData());
-        psVenda.setString(2, venda.getCliente().getCpf());
+        if (venda.getCliente() != null) {
+            psVenda.setString(2, venda.getCliente().getCpf());
+        } else {
+            psVenda.setString(2, null);
+        }
 
         if (venda.getFuncionario() != null) {
             psVenda.setString(3, venda.getFuncionario().getMatricula());

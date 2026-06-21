@@ -86,14 +86,18 @@ public class ViewVenda extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Item", "Descrição", "Valor"
+                "Item", "Descrição", "Qtd", "Valor Unitário", "Subtotal"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class
+                java.lang.Integer.class, 
+                java.lang.String.class, 
+                java.lang.Integer.class,
+                java.lang.Double.class,
+                java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -119,9 +123,34 @@ public class ViewVenda extends javax.swing.JPanel {
         jTableItens.getColumnModel().getColumn(2).setMinWidth(80);
         jTableItens.getColumnModel().getColumn(2).setPreferredWidth(80);
         jTableItens.getColumnModel().getColumn(2).setMaxWidth(80);
-        jTableItens.getColumnModel().getColumn(2).setHeaderValue("Valor");
+        jTableItens.getColumnModel().getColumn(2).setHeaderValue("Qtd");
+        jTableItens.getColumnModel().getColumn(3).setMinWidth(80);
+        jTableItens.getColumnModel().getColumn(3).setMaxWidth(100);
+        jTableItens.getColumnModel().getColumn(3).setPreferredWidth(90);
 
-        jButtonCliente.setText("Seleciona");
+        jTableItens.getColumnModel().getColumn(4).setMinWidth(70);
+        jTableItens.getColumnModel().getColumn(4).setMaxWidth(90);
+        jTableItens.getColumnModel().getColumn(4).setPreferredWidth(80);
+
+        java.text.NumberFormat nf =
+            java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("pt", "BR"));
+
+        javax.swing.table.DefaultTableCellRenderer moedaRenderer =
+            new javax.swing.table.DefaultTableCellRenderer() {
+                @Override
+                protected void setValue(Object value) {
+                    if (value instanceof Number) {
+                        setText(nf.format(((Number) value).doubleValue()));
+                    } else {
+                        setText("");
+                    }
+                }
+            };
+
+        jTableItens.getColumnModel().getColumn(3).setCellRenderer(moedaRenderer);
+        jTableItens.getColumnModel().getColumn(4).setCellRenderer(moedaRenderer);
+
+        jButtonCliente.setText("Selecionar");
         jButtonCliente.setName("jButtonCliente"); // NOI18N
         jButtonCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -282,6 +311,7 @@ public class ViewVenda extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonNovaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNovaActionPerformed
+        limparVenda();
         venda = new Venda();
         jTextFielData.setText(venda.retornaData());
         jPanelVenda.setVisible(true);
@@ -359,9 +389,11 @@ public class ViewVenda extends javax.swing.JPanel {
 
     }//GEN-LAST:event_jButtonPagamentoActionPerformed
 
-    private void jButtonFecharJanelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFecharJanelaActionPerformed
+    private void jButtonFecharJanelaActionPerformed(java.awt.event.ActionEvent evt) {
+        limparVenda();
         jPanelNotaFiscal.setVisible(false);
-    }//GEN-LAST:event_jButtonFecharJanelaActionPerformed
+        jPanelVenda.setVisible(false);
+    }
 
     private void incluiritem() {
 
@@ -408,15 +440,39 @@ public class ViewVenda extends javax.swing.JPanel {
                 return;
             }
 
-            venda.inserirProduto(produto);
+            String qtdStr = JOptionPane.showInputDialog(
+                    null,
+                    "Quantidade:"
+            );
+
+            if (qtdStr == null || qtdStr.trim().isEmpty()) {
+                return;
+            }
+
+            int qtd = Integer.parseInt(qtdStr);
+
+            boolean ok = venda.inserirProduto(produto, qtd);
+
+            if (!ok) {
+                JOptionPane.showMessageDialog(null, "Estoque insuficiente!");
+                return;
+            }
+
+            int quantidade = qtd;
+
+            double unitario = produto.getPrecoVenda();
+            double subtotal = unitario * quantidade;
 
             model.insertRow(
-                    model.getRowCount(),
-                    new Object[]{
-                        model.getRowCount() + 1,
-                        produto.getNome(),
-                        produto.getPrecoReais()
-                    });
+                model.getRowCount(),
+                new Object[]{
+                    model.getRowCount() + 1,
+                    produto.getNome(),
+                    quantidade,
+                    unitario,
+                    subtotal
+                });
+                    
 
         } else {
 
@@ -432,22 +488,68 @@ public class ViewVenda extends javax.swing.JPanel {
                 return;
             }
 
-            venda.inserirServico(servico);
+            String qtdStr = JOptionPane.showInputDialog(
+                    null,
+                    "Quantidade:"
+            );
+
+            if (qtdStr == null || qtdStr.trim().isEmpty()) {
+                return;
+            }
+
+            int qtd = Integer.parseInt(qtdStr);
+
+            venda.inserirServico(servico, qtd);
+
+
+            int quantidade = qtd;
+
+            double unitario = servico.getPrecoServico();
+            double subtotal = unitario * quantidade;
 
             model.insertRow(
-                    model.getRowCount(),
-                    new Object[]{
-                        model.getRowCount() + 1,
-                        servico.getNome(),
-                        servico.getPrecoReais()
-                    });
+                model.getRowCount(),
+                new Object[]{
+                    model.getRowCount() + 1,
+                    servico.getNome(),
+                    quantidade,
+                    unitario,
+                    subtotal
+                });
+
+
         }
 
         jLabelValor.setVisible(true);
-        jLabelValor.setText(venda.getTotalReais());
+        jLabelValor.setText("R$ " + String.format("%.2f", venda.getTotal()));
 
         jButtonPagamento.setVisible(true);
     }
+
+
+    private void limparVenda() {
+
+    // 1. zera objeto da venda
+    venda = null;
+
+    // 2. limpa tabela
+    DefaultTableModel model = (DefaultTableModel) jTableItens.getModel();
+    model.setRowCount(0);
+
+    // 3. limpa campos
+    jTextFieldCliente.setText("");
+    jTextFielData.setText("");
+
+    // 4. reseta total
+    jLabelValor.setText("R$ 0,00");
+
+    // 5. esconde botões importantes
+    jButtonPagamento.setVisible(false);
+
+    // 6. limpa nota fiscal
+    jTextAreaNotaFiscal.setText("");
+}
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCliente;
     private javax.swing.JButton jButtonFecharJanela;

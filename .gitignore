@@ -2,7 +2,7 @@
 *.class
 
 # Banco de dados
-*.db
+#*.db
 
 # IDEs
 .idea/
@@ -15,3 +15,5 @@ lib/*.jar
 # Java compiled
 bin/
 *.class
+*.db-shm
+*.db-wal

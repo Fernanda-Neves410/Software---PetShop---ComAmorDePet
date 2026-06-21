@@ -68,6 +68,7 @@ public class CriarTabelas {
                 "login TEXT, " +
                 "permissao INTEGER" +
                 ");";
+                
 
         try (
             Connection conn = ConexaoBD.conectar();

@@ -26,7 +26,12 @@ public class ServicoDAO {
             PreparedStatement ps = conn.prepareStatement(sql)
         ) {
 
-            ps.setString(1, novoServico.getCodigoServico());
+            ps.setString(1,
+                retiraPontuacao(
+                    novoServico.getCodigoServico().trim().toUpperCase()
+                )
+            );
+
             ps.setString(2, novoServico.getNome());
             ps.setDouble(3, novoServico.getPrecoServico());
 
@@ -74,7 +79,7 @@ public class ServicoDAO {
 
     public Servico buscarPorCodigoServico(String cod) {
 
-        cod = retiraPontuacao(cod);
+        cod = retiraPontuacao(cod.trim().toUpperCase());
 
         String sql =
                 "SELECT * FROM servico WHERE codigo_servico = ?";

@@ -8,6 +8,8 @@ public class Cliente implements Serializable {
 	private String endereco;
 	private String telefone;
 	private String email;
+	private String cidade;
+	private String estado;
 //	private Venda venda;
 
 	public Cliente(String cpf, String nome, String endereco, String telefone, String email) {
@@ -53,6 +55,23 @@ public class Cliente implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+	public String getCidade() {
+    	return cidade;
+	}
+
+	public void setCidade(String cidade) {
+		this.cidade = cidade;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
 	
     public String imprimir() {
         return "CPF: " + getCpf() + " / Nome: " + getNome() + " / Endereço: " + getEndereco() + 

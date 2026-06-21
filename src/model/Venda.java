@@ -105,7 +105,11 @@ public class Venda implements Serializable {
         String nota = new String();
         ItemVenda item;
         nota += "Data e hora da compra: " + retornaData() + "\n";
-        nota += "Cliente: " + cliente.getNome() + " - CPF: " + cliente.getCpf() + "\n\n";
+        if (cliente != null) {
+            nota += "Cliente: " + cliente.getNome() + " - CPF: " + cliente.getCpf() + "\n\n";
+        } else {
+            nota += "Cliente não identificado\n\n";
+        }
         nota += "Lista de itens vendidos: \n";
 
         Iterator<ItemVenda> ite = itensVenda.iterator();
@@ -178,11 +182,18 @@ public class Venda implements Serializable {
         String relatorio = "";
 
         relatorio += "Data: " + retornaData();
-        relatorio += " - Cliente: " + cliente.getNome();
-        relatorio += " - CPF: " + cliente.getCpf();
+
+        if (cliente != null) {
+            relatorio += " - Cliente: " + cliente.getNome();
+            relatorio += " - CPF: " + cliente.getCpf();
+        } else {
+            relatorio += " - Cliente não identificado";
+        }
+
         relatorio += " - Itens vendidos: " + getQuantidadeItensVendidos();
         relatorio += " - Valor total: " + getTotalReais();
         relatorio += " - Forma de pagamento: " + getFormaPagamento();
+
         return relatorio;
     }
     
