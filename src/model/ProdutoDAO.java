@@ -16,15 +16,13 @@ public class ProdutoDAO {
 
     public boolean salvar(Produto novoProduto) {
 
-        String sql =
-            "INSERT INTO produto " +
-            "(codigo_barras, nome, fabricante, categoria, preco_venda, quantidade_estoque) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO produto " +
+                "(codigo_barras, nome, fabricante, categoria, preco_venda, quantidade_estoque) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (
-            Connection conn = ConexaoBD.conectar();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                Connection conn = ConexaoBD.conectar();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, novoProduto.getCodigoBarras());
             ps.setString(2, novoProduto.getNome());
@@ -52,10 +50,9 @@ public class ProdutoDAO {
         String sql = "SELECT * FROM produto";
 
         try (
-            Connection conn = ConexaoBD.conectar();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)
-        ) {
+                Connection conn = ConexaoBD.conectar();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
 
@@ -65,8 +62,7 @@ public class ProdutoDAO {
                         rs.getString("fabricante"),
                         rs.getString("categoria"),
                         rs.getDouble("preco_venda"),
-                        rs.getInt("quantidade_estoque")
-                );
+                        rs.getInt("quantidade_estoque"));
 
                 listaProdutos.add(p);
             }
@@ -82,13 +78,11 @@ public class ProdutoDAO {
 
         cod = retiraPontuacao(cod);
 
-        String sql =
-                "SELECT * FROM produto WHERE codigo_barras = ?";
+        String sql = "SELECT * FROM produto WHERE codigo_barras = ?";
 
         try (
-            Connection conn = ConexaoBD.conectar();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                Connection conn = ConexaoBD.conectar();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, cod);
 
@@ -102,8 +96,7 @@ public class ProdutoDAO {
                         rs.getString("fabricante"),
                         rs.getString("categoria"),
                         rs.getDouble("preco_venda"),
-                        rs.getInt("quantidade_estoque")
-                );
+                        rs.getInt("quantidade_estoque"));
             }
 
         } catch (SQLException e) {
@@ -111,6 +104,31 @@ public class ProdutoDAO {
         }
 
         return null;
+    }
+
+    public boolean venderEstoque(Connection conn, String cod, int quantidade) {
+        cod = retiraPontuacao(cod);
+
+        String sql = "UPDATE produto SET quantidade_estoque = quantidade_estoque - ? " +
+                "WHERE codigo_barras = ? AND quantidade_estoque >= ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, quantidade);
+            ps.setString(2, cod);
+            ps.setInt(3, quantidade);
+
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public String gerarRelatorio() {
@@ -124,16 +142,14 @@ public class ProdutoDAO {
         if (listaProdutos.isEmpty()) {
 
             relatorio.append(
-                    " - - não há produtos cadastrados - - "
-            );
+                    " - - não há produtos cadastrados - - ");
 
         } else {
 
             for (Produto produto : listaProdutos) {
 
                 relatorio.append(
-                        produto.imprimir()
-                ).append("\n");
+                        produto.imprimir()).append("\n");
             }
         }
 

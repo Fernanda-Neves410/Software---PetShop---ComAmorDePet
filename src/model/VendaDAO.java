@@ -8,75 +8,85 @@ public class VendaDAO {
 
     public void salvar(Venda venda) {
 
-    String sqlVenda =
-        "INSERT INTO venda (data, cpf_cliente, matricula_funcionario, forma_pagamento, total) " +
-        "VALUES (?, ?, ?, ?, ?)";
+        String sqlVenda = "INSERT INTO venda (data, cpf_cliente, matricula_funcionario, forma_pagamento, total) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
-    String sqlItem =
-        "INSERT INTO item_venda (venda_id, tipo, nome_item, quantidade, valor_unitario, subtotal) " +
-        "VALUES (?, ?, ?, ?, ?, ?)";
+        String sqlItem = "INSERT INTO item_venda (venda_id, tipo, nome_item, quantidade, valor_unitario, subtotal) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
-    try (
-        Connection conn = ConexaoBD.conectar();
-        PreparedStatement psVenda =
-                conn.prepareStatement(sqlVenda, Statement.RETURN_GENERATED_KEYS)
-    ) {
+        try (
+                Connection conn = ConexaoBD.conectar();
+                PreparedStatement psVenda = conn.prepareStatement(sqlVenda, Statement.RETURN_GENERATED_KEYS)) {
 
-        psVenda.setString(1, venda.retornaData());
-        if (venda.getCliente() != null) {
-            psVenda.setString(2, venda.getCliente().getCpf());
-        } else {
-            psVenda.setString(2, null);
-        }
-
-        if (venda.getFuncionario() != null) {
-            psVenda.setString(3, venda.getFuncionario().getMatricula());
-        } else {
-            psVenda.setString(3, null);
-        }
-
-        psVenda.setString(4, venda.getFormaPagamento());
-        psVenda.setDouble(5, venda.getTotal());
-
-        psVenda.executeUpdate();
-
-        ResultSet rs = psVenda.getGeneratedKeys();
-
-        if (rs.next()) {
-
-            int vendaId = rs.getInt(1);
-            venda.setId(vendaId);
-
-            PreparedStatement psItem =
-                    conn.prepareStatement(sqlItem);
-
-            for (ItemVenda item : venda.getItensVenda()) {
-
-                psItem.setInt(1, vendaId);
-                psItem.setInt(2, item.getTipo());
-
-                if (item.getTipo() == 1) {
-                    psItem.setString(3,
-                            item.getProdutoVendido().getNome());
-                } else {
-                    psItem.setString(3,
-                            item.getServicoContratado().getNome());
-                }
-
-                psItem.setInt(4, item.getQuantidade());
-                psItem.setDouble(5, item.getValorUnitario());
-                psItem.setDouble(6, item.getSubTotal());
-
-                psItem.executeUpdate();
+            psVenda.setString(1, venda.retornaData());
+            if (venda.getCliente() != null) {
+                psVenda.setString(2, venda.getCliente().getCpf());
+            } else {
+                psVenda.setString(2, null);
             }
+
+            if (venda.getFuncionario() != null) {
+                psVenda.setString(3, venda.getFuncionario().getMatricula());
+            } else {
+                psVenda.setString(3, null);
+            }
+
+            psVenda.setString(4, venda.getFormaPagamento());
+            psVenda.setDouble(5, venda.getTotal());
+
+            psVenda.executeUpdate();
+
+            ResultSet rs = psVenda.getGeneratedKeys();
+
+            if (rs.next()) {
+
+                int vendaId = rs.getInt(1);
+                venda.setId(vendaId);
+
+                PreparedStatement psItem = conn.prepareStatement(sqlItem);
+
+                for (ItemVenda item : venda.getItensVenda()) {
+
+                    psItem.setInt(1, vendaId);
+                    psItem.setInt(2, item.getTipo());
+
+                    if (item.getTipo() == 1) {
+                        psItem.setString(3,
+                                item.getProdutoVendido().getNome());
+                    } else {
+                        psItem.setString(3,
+                                item.getServicoContratado().getNome());
+                    }
+
+                    psItem.setInt(4, item.getQuantidade());
+                    psItem.setDouble(5, item.getValorUnitario());
+                    psItem.setDouble(6, item.getSubTotal());
+
+                    if (item.getTipo() == 1) {
+                        ProdutoDAO produtoDAO = new ProdutoDAO();
+                        Produto produto = item.getProdutoVendido();
+
+                        boolean estoqueAtualizado = produtoDAO.venderEstoque(
+                                conn,
+                                produto.getCodigoBarras(),
+                                item.getQuantidade());
+
+                        if (!estoqueAtualizado) {
+                            throw new SQLException("Falha ao atualizar o estoque do produto: " + produto.getNome());
+                        }
+                    }
+
+                    psItem.executeUpdate();
+                }
+            }
+
+            System.out.println("Venda salva no banco.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        System.out.println("Venda salva no banco.");
-
-    } catch (SQLException e) {
-        e.printStackTrace();
     }
-}
+
     public List<Venda> buscarTodos() {
 
         List<Venda> vendas = new ArrayList<>();
@@ -84,10 +94,9 @@ public class VendaDAO {
         String sql = "SELECT * FROM VENDA";
 
         try (
-            Connection conn = ConexaoBD.conectar();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)
-        ) {
+                Connection conn = ConexaoBD.conectar();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
 
@@ -95,8 +104,7 @@ public class VendaDAO {
 
                 venda.setId(rs.getInt("id"));
                 venda.setFormaPagamento(
-                        rs.getString("forma_pagamento")
-                );
+                        rs.getString("forma_pagamento"));
 
                 vendas.add(venda);
             }
@@ -119,19 +127,17 @@ public class VendaDAO {
         if (vendas.isEmpty()) {
 
             relatorio.append(
-                    " - - não há vendas registradas - - "
-            );
+                    " - - não há vendas registradas - - ");
 
         } else {
 
             for (Venda venda : vendas) {
                 relatorio.append(
                         "Venda #"
-                        + venda.getId()
-                        + " - "
-                        + venda.getFormaPagamento()
-                        + "\n"
-                );
+                                + venda.getId()
+                                + " - "
+                                + venda.getFormaPagamento()
+                                + "\n");
             }
         }
 
