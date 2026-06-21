@@ -16,7 +16,7 @@ public class ViewBoasVindas extends JPanel {
         centro.setLayout(new BoxLayout(centro, BoxLayout.Y_AXIS));
 
         // ===== TÍTULO =====
-        JLabel titulo = new JLabel("🐾 Com Amor de Pet 🐾");
+        JLabel titulo = new JLabel(" Com Amor de Pet ");
         titulo.setFont(new Font("Tahoma", Font.BOLD, 28));
         titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
