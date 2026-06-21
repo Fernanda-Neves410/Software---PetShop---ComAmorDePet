@@ -2,7 +2,7 @@
 *.class
 
 # Banco de dados
-#*.db
+*.db
 
 # IDEs
 .idea/
