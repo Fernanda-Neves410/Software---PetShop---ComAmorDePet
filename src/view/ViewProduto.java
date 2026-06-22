@@ -242,6 +242,7 @@ public class ViewProduto extends javax.swing.JPanel {
     }
 
     private void editarProduto() {
+        String codigo = jFTextFieldCodBarras.getText().trim();
 
         Produto existente = ComAmorDePetApp.controle.buscarProdutoCodigo(codigo);
 
@@ -249,7 +250,6 @@ public class ViewProduto extends javax.swing.JPanel {
             ComAmorDePetApp.mostraMensagem("Produto não existe!", "Erro");
             return;
         }
-        String codigo = jFTextFieldCodBarras.getText().trim();
 
         String nome = jTextFieldTitulo.getText().trim();
         String fabricante = jTextFieldFabricante.getText().trim();
@@ -294,8 +294,10 @@ public class ViewProduto extends javax.swing.JPanel {
             return;
         }
 
-        boolean ok = ComAmorDePetApp.controle.excluirProduto(cod);
+        String codigo = jFTextFieldCodBarras.getText().trim();
 
+        boolean ok = ComAmorDePetApp.controle.excluirProduto(codigo);
+        
         if (ok) {
             ComAmorDePetApp.mostraMensagem("Produto excluído com sucesso!", "Sucesso");
             limparCampos();

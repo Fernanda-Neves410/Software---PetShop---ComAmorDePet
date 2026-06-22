@@ -98,7 +98,7 @@ public class ComAmorDePetGerenciadora {
     }
 
 
-    public boolean excluirProdutoProduto(Produto p) {
-        return produtoDAO.excluir(p);
+    public boolean excluirProduto(String cod) {
+        return produtoDAO.excluir(cod);
     }
 }

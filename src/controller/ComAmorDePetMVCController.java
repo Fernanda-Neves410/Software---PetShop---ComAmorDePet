@@ -87,8 +87,8 @@ public class ComAmorDePetMVCController {
         return gerenciadora.atualizarProduto(p);
     }
 
-        public boolean excluirProdutoProduto(Produto p) {
-        return gerenciadora.excluirProduto(p);
+    public boolean excluirProduto(String cod) {
+        return gerenciadora.excluirProduto(cod);
     }
 
 }
