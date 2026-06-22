@@ -1,243 +1,124 @@
 package view;
 
 import controller.ComAmorDePetMVCController;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
+import model.Funcionario;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ComAmorDePetApp extends javax.swing.JFrame {
 
     static protected ComAmorDePetMVCController controle;
+    private int nivelUsuarioLogado; // Armazena o nível para controle de acesso
+    
+    // Painéis da aplicação
+    private JPanel containerPrincipal = new JPanel(new CardLayout());
+    private ViewLogin painelLogin = new ViewLogin();
+    private ViewCliente painelCliente = new ViewCliente();
+    private ViewAnimal painelAnimal = new ViewAnimal();
+    private ViewProduto painelProduto = new ViewProduto();
+    private ViewServico painelServico = new ViewServico();
+    private ViewVenda painelVenda = new ViewVenda();
+    private ViewRelatorio painelRelatorio = new ViewRelatorio();
+    private ViewBoasVindas painelHome = new ViewBoasVindas();
+    private ViewFuncionario painelFuncionario = new ViewFuncionario();
 
-    /** Creates new form ComAmorDePet */
     public ComAmorDePetApp() {
         controle = new ComAmorDePetMVCController();
         initComponents();
         setSize(1000, 700);
         setLocationRelativeTo(null);
+        
+        containerPrincipal.add(painelLogin, "login");
+        containerPrincipal.add(painelHome, "home");
+        containerPrincipal.add(painelCliente, "cliente");
+        containerPrincipal.add(painelAnimal, "animal");
+        containerPrincipal.add(painelProduto, "produto");
+        containerPrincipal.add(painelServico, "servico");
+        containerPrincipal.add(painelVenda, "venda");
+        containerPrincipal.add(painelRelatorio, "relatorio");
+        containerPrincipal.add(painelFuncionario, "funcionario");
+        
+        setContentPane(containerPrincipal);
+        ((CardLayout) containerPrincipal.getLayout()).show(containerPrincipal, "login");
     }
 
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Iniciando componentes">
+    public void logar(Funcionario f) {
+        this.nivelUsuarioLogado = f.getPermissao();
+        ((CardLayout) containerPrincipal.getLayout()).show(containerPrincipal, "home");
+        jMenuBar1.setVisible(true);
+        aplicarPermissoes(nivelUsuarioLogado);
+        
+        revalidate();
+        repaint();
+        JOptionPane.showMessageDialog(this, "Bem-vindo(a), " + f.getNome());
+    }
+
+    // Método "porteiro": valida o acesso antes de trocar
+    private void trocarTela(String nomeTela) {
+        if (nomeTela.equals("funcionario") && nivelUsuarioLogado != 1) {
+            mostraMensagem("Acesso negado: Apenas Administradores.", "Erro");
+            return;
+        }
+        if ((nomeTela.equals("cliente") || nomeTela.equals("animal") || nomeTela.equals("produto")) 
+             && nivelUsuarioLogado == 3) {
+            mostraMensagem("Acesso negado: Nível de Cuidador restrito.", "Erro");
+            return;
+        }
+        ((CardLayout) containerPrincipal.getLayout()).show(containerPrincipal, nomeTela);
+    }
+
+    private void aplicarPermissoes(int nivel) {
+        jMenuFuncionario.setVisible(nivel == 1);
+        jMenuProduto.setVisible(nivel == 1 || nivel == 2);
+        jMenuCliente.setVisible(nivel == 1 || nivel == 2);
+        jMenuAnimal.setVisible(nivel == 1 || nivel == 2);
+        
+        jMenuVenda.setVisible(true);
+        jMenuServico.setVisible(true);
+        jMenuRelatorio.setVisible(true);
+        jMenuSair.setVisible(true);
+    }
+
     private void initComponents() {
         this.setTitle("Com Amor de Pet - Gestão de PetShop");
 
-        String lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
-
-        try {
-            UIManager.setLookAndFeel(lookAndFeel);
-        } catch (Exception e) {
-        }
-
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenuHome = new javax.swing.JMenu();
-        jMenuVenda = new javax.swing.JMenu();
-        jMenuCliente = new javax.swing.JMenu();
-        jMenuAnimal = new javax.swing.JMenu();
-        jMenuProduto = new javax.swing.JMenu();
-        jMenuRelatorio = new javax.swing.JMenu();
-        jMenuServico = new javax.swing.JMenu();
-        jMenuSair = new javax.swing.JMenu();
+        jMenuHome = new javax.swing.JMenu("Início");
+        jMenuVenda = new javax.swing.JMenu("Venda");
+        jMenuCliente = new javax.swing.JMenu("Cliente");
+        jMenuAnimal = new javax.swing.JMenu("Animal");
+        jMenuProduto = new javax.swing.JMenu("Produto");
+        jMenuRelatorio = new javax.swing.JMenu("Relatório");
+        jMenuServico = new javax.swing.JMenu("Serviço");
+        jMenuFuncionario = new javax.swing.JMenu("Funcionário");
+        jMenuSair = new javax.swing.JMenu("Sair");
 
-        painelCliente = new ViewCliente();
-        painelAnimal = new ViewAnimal();
-        painelRelatorio = new ViewRelatorio();
-        painelProduto = new ViewProduto();
-        painelHome = new ViewBoasVindas();
-        painelVenda = new ViewVenda();
-        painelServico = new ViewServico();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jMenuBar1.setName("jMenuBar1");
-
-        jMenuHome.setText("Home");
-        jMenuHome.setName("jMenuHome");
-        jMenuHome.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenuHomeMouseClicked(evt);
-            }
-        });
+        jMenuBar1.setVisible(false);
+        
+        // Eventos de clique protegidos pelo método trocarTela
+        jMenuHome.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { trocarTela("home"); } });
+        jMenuCliente.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { trocarTela("cliente"); } });
+        jMenuAnimal.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { trocarTela("animal"); } });
+        jMenuProduto.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { trocarTela("produto"); } });
+        jMenuServico.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { trocarTela("servico"); } });
+        jMenuVenda.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { trocarTela("venda"); } });
+        jMenuRelatorio.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { trocarTela("relatorio"); } });
+        jMenuFuncionario.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { trocarTela("funcionario"); } });
+        jMenuSair.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { System.exit(0); } });
+        
         jMenuBar1.add(jMenuHome);
-
-        jMenuVenda.setText("Vendas");
-        jMenuVenda.setName("jMenuVenda");
-        jMenuVenda.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenuVendaMouseClicked(evt);
-            }
-        });
         jMenuBar1.add(jMenuVenda);
-
-        jMenuCliente.setText("Clientes");
-        jMenuCliente.setName("jMenuCliente");
-        jMenuCliente.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenuClienteMouseClicked(evt);
-            }
-        });
         jMenuBar1.add(jMenuCliente);
-
-        jMenuAnimal.setText("Animais");
-        jMenuAnimal.setName("jMenuAnimal");
-        jMenuAnimal.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenuAnimalMouseClicked(evt);
-            }
-        });
         jMenuBar1.add(jMenuAnimal);
-
-        jMenuProduto.setText("Produtos");
-        jMenuProduto.setName("jMenuProduto");
-        jMenuProduto.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenuProdutoMouseClicked(evt);
-            }
-        });
         jMenuBar1.add(jMenuProduto);
-
-        jMenuServico.setText("Serviços");
-        jMenuServico.setName("jMenuServico");
-        jMenuServico.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                painelHome.setVisible(false);
-                painelCliente.setVisible(false);
-                painelAnimal.setVisible(false);
-                painelProduto.setVisible(false);
-                painelRelatorio.setVisible(false);
-                painelVenda.setVisible(false);
-                painelServico.setVisible(true);
-            }
-        });
         jMenuBar1.add(jMenuServico);
-
-        jMenuRelatorio.setText("Relatório");
-        jMenuRelatorio.setName("jMenuRelatorio");
-        jMenuRelatorio.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenuRelatorioMouseClicked(evt);
-            }
-        });
         jMenuBar1.add(jMenuRelatorio);
-
-        jMenuSair.setText("Sair");
-        jMenuSair.setName("jMenuSair");
-        jMenuSair.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenuSairMouseClicked(evt);
-            }
-        });
+        jMenuBar1.add(jMenuFuncionario);
         jMenuBar1.add(jMenuSair);
-
+        
         setJMenuBar(jMenuBar1);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-
-        painelCliente.setVisible(false);
-        painelAnimal.setVisible(false);
-        painelRelatorio.setVisible(false);
-        painelProduto.setVisible(false);
-        painelHome.setVisible(true);
-        painelVenda.setVisible(false);
-        painelServico.setVisible(false);
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(31, 31, 31)
-                                .addComponent(painelVenda)
-                                .addComponent(painelHome)
-                                .addComponent(painelCliente)
-                                .addComponent(painelAnimal)
-                                .addComponent(painelRelatorio)
-                                .addComponent(painelProduto)
-                                .addComponent(painelServico)
-                                .addContainerGap(121, Short.MAX_VALUE)));
-
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(31, 31, 31)
-                                .addComponent(painelVenda)
-                                .addComponent(painelHome)
-                                .addComponent(painelCliente)
-                                .addComponent(painelAnimal)
-                                .addComponent(painelRelatorio)
-                                .addComponent(painelProduto)
-                                .addComponent(painelServico)
-                                .addContainerGap(137, Short.MAX_VALUE)));
-
-        pack();
-    }// </editor-fold>
-
-    private void jMenuSairMouseClicked(java.awt.event.MouseEvent evt) {
-        int valor = 0;
-        valor = JOptionPane.showConfirmDialog(null, "Fim do sistema?",
-                "Finaliza sistema", JOptionPane.YES_NO_OPTION);
-        if (valor == 0) {
-            System.exit(0);
-        }
-    }
-
-    private void jMenuHomeMouseClicked(java.awt.event.MouseEvent evt) {
-        painelHome.setVisible(true);
-        painelCliente.setVisible(false);
-        painelAnimal.setVisible(false);
-        painelProduto.setVisible(false);
-        painelRelatorio.setVisible(false);
-        painelVenda.setVisible(false);
-        painelServico.setVisible(false);
-    }
-
-    private void jMenuClienteMouseClicked(java.awt.event.MouseEvent evt) {
-        painelHome.setVisible(false);
-        painelCliente.setVisible(true);
-        painelAnimal.setVisible(false);
-        painelProduto.setVisible(false);
-        painelRelatorio.setVisible(false);
-        painelVenda.setVisible(false);
-        painelServico.setVisible(false);
-    }
-
-    private void jMenuAnimalMouseClicked(java.awt.event.MouseEvent evt) {
-        painelHome.setVisible(false);
-        painelCliente.setVisible(false);
-        painelAnimal.setVisible(true);
-        painelProduto.setVisible(false);
-        painelRelatorio.setVisible(false);
-        painelVenda.setVisible(false);
-        painelServico.setVisible(false);
-    }
-
-    private void jMenuRelatorioMouseClicked(java.awt.event.MouseEvent evt) {
-        painelHome.setVisible(false);
-        painelCliente.setVisible(false);
-        painelAnimal.setVisible(false);
-        painelProduto.setVisible(false);
-        painelRelatorio.setVisible(true);
-        painelVenda.setVisible(false);
-        painelServico.setVisible(false);
-    }
-
-    private void jMenuProdutoMouseClicked(java.awt.event.MouseEvent evt) {
-        painelHome.setVisible(false);
-        painelCliente.setVisible(false);
-        painelAnimal.setVisible(false);
-        painelProduto.setVisible(true);
-        painelRelatorio.setVisible(false);
-        painelVenda.setVisible(false);
-        painelServico.setVisible(false);
-    }
-
-    private void jMenuVendaMouseClicked(java.awt.event.MouseEvent evt) {
-        painelHome.setVisible(false);
-        painelCliente.setVisible(false);
-        painelAnimal.setVisible(false);
-        painelProduto.setVisible(false);
-        painelRelatorio.setVisible(false);
-        painelVenda.setVisible(true);
-        painelServico.setVisible(false);
     }
 
     static protected void mostraMensagem(String texto, String titulo) {
@@ -246,28 +127,10 @@ public class ComAmorDePetApp extends javax.swing.JFrame {
 
     public static void main(String args[]) {
         model.CriarTabelas.criarTabelas();
-
-        java.awt.EventQueue.invokeLater(() -> {
-            new ComAmorDePetApp().setVisible(true);
-        });
+        java.awt.EventQueue.invokeLater(() -> new ComAmorDePetApp().setVisible(true));
     }
 
-    // Variables declaration
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenu jMenuProduto;
-    private javax.swing.JMenu jMenuCliente;
-    private javax.swing.JMenu jMenuAnimal;
-    private javax.swing.JMenu jMenuRelatorio;
-    private javax.swing.JMenu jMenuSair;
-    private javax.swing.JMenu jMenuVenda;
-    private javax.swing.JMenu jMenuHome;
-    private javax.swing.JMenu jMenuServico;
-
-    private JPanel painelCliente;
-    private JPanel painelAnimal;
-    private JPanel painelRelatorio;
-    private JPanel painelProduto;
-    private JPanel painelHome;
-    private JPanel painelVenda;
-    private JPanel painelServico;
+    private javax.swing.JMenu jMenuProduto, jMenuCliente, jMenuAnimal, jMenuRelatorio, 
+                           jMenuSair, jMenuVenda, jMenuHome, jMenuServico, jMenuFuncionario;
 }
